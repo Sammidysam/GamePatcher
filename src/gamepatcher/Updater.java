@@ -1,23 +1,24 @@
 package gamepatcher;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Calendar;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Updater {
 	private String filePath;
-	private String datePath;
 	private String uploadPath;
 	private String fileName;
 	private String dateName;
 	private boolean canMake = true;
 	public Updater(String fileName, String dateName, String uploadPath){
 		filePath = System.getProperty("user.dir") + File.separatorChar + fileName;
-		datePath = System.getProperty("user.dir") + File.separatorChar + dateName;
 		this.uploadPath = uploadPath;
 		if(uploadPath.charAt(uploadPath.length() - 1) != File.separatorChar){
 			System.out.println("uploadPath must end in " + File.separatorChar);
@@ -36,13 +37,39 @@ public class Updater {
 			System.out.println("Updating files...");
 			Path originalFile = Paths.get(filePath);
 			Path newFile = Paths.get(uploadPath + fileName);
-			Path originalDate = Paths.get(datePath);
-			Path newDate = Paths.get(uploadPath + dateName);
 			try {
 				Files.copy(originalFile, newFile, REPLACE_EXISTING);
-				Files.copy(originalDate, newDate, REPLACE_EXISTING);
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+			System.out.println("File updated.  Timestamping...");
+			File file = new File(uploadPath + dateName);
+			try {
+				file.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			if(file.exists()){
+				Calendar calendar = Calendar.getInstance();
+				String[] values = new String[6];
+				values[0] = String.valueOf(calendar.get(Calendar.YEAR));
+				values[1] = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+				values[2] = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+				values[3] = String.valueOf(calendar.get(Calendar.HOUR));
+				values[4] = String.valueOf(calendar.get(Calendar.MINUTE));
+				values[5] = String.valueOf(calendar.get(Calendar.SECOND));
+				try {
+					FileWriter dateWriter = new FileWriter(file);
+					BufferedWriter bw = new BufferedWriter(dateWriter);
+					for(int i = 0; i < values.length; i++){
+						bw.write(values[i]);
+						bw.newLine();
+					}
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				System.out.println("Timestamp complete");
 			}
 			System.out.println("Update complete");
 		}
