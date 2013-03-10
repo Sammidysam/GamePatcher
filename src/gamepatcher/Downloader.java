@@ -123,7 +123,7 @@ public class Downloader {
 				while(position < size){
 					position += fos.getChannel().transferFrom(rbc, position, chunkSize);
 					progress = Math.round((float)(100 * (float)position / (float)size) * (float)10) / (float)10;
-					System.out.println(progress);
+					System.out.println(progress + "% done");
 				}
 			else
 				fos.getChannel().transferFrom(rbc, 0, size);
