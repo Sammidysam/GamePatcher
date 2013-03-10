@@ -53,8 +53,8 @@ public class Updater {
 			if(file.exists()){
 				Calendar calendar = Calendar.getInstance();
 				String[] values = new String[6];
-				TimeZone gmt = TimeZone.getTimeZone("GMT");
-				calendar.setTimeZone(gmt);
+				TimeZone utc = TimeZone.getTimeZone("UTC");
+				calendar.setTimeZone(utc);
 				values[0] = String.valueOf(calendar.get(Calendar.YEAR));
 				values[1] = String.valueOf(calendar.get(Calendar.MONTH) + 1);
 				values[2] = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
