@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -21,7 +22,34 @@ public class Downloader {
 	private String datePath;
 	private String fileSite;
 	private String dateSite;
+	private long chunkSize;
+	private boolean usingChunks;
+	private float progress;
 	private boolean hasInternet;
+	public Downloader(String fileName, String dateName, String fileSite, String dateSite, long chunkSize){
+		filePath = System.getProperty("user.dir") + File.separatorChar + fileName;
+		datePath = System.getProperty("user.dir") + File.separatorChar + dateName;
+		this.fileSite = fileSite;
+		this.dateSite = dateSite;
+		System.out.println("Checking if internet is available...");
+		try {
+			InetAddress gitHub = InetAddress.getByName(new URL("https://github.com/").getHost());
+			if(gitHub.isReachable(5000)){
+				hasInternet = true;
+				System.out.println("Internet connection available");
+			}
+			else
+				hasInternet = false;	
+		} catch (UnknownHostException e) {
+			hasInternet = false;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.chunkSize = chunkSize;
+		usingChunks = true;
+	}
 	public Downloader(String fileName, String dateName, String fileSite, String dateSite){
 		filePath = System.getProperty("user.dir") + File.separatorChar + fileName;
 		datePath = System.getProperty("user.dir") + File.separatorChar + dateName;
@@ -43,6 +71,7 @@ public class Downloader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		usingChunks = false;
 	}
 	public void checkForUpdate(){
 		if(hasInternet){
@@ -85,9 +114,19 @@ public class Downloader {
 		System.out.println("Downloading...");
 		try {
 			URL file = new URL(fileSite);
+			URLConnection urlconnection = file.openConnection();
+			long size = urlconnection.getContentLength();
 			ReadableByteChannel rbc = Channels.newChannel(file.openStream());
 			FileOutputStream fos = new FileOutputStream(filePath);
-			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			long position = 0;
+			if(usingChunks)
+				while(position < size){
+					position += fos.getChannel().transferFrom(rbc, position, chunkSize);
+					progress = Math.round((float)(100 * (float)position / (float)size) * (float)10) / (float)10;
+					System.out.println(progress);
+				}
+			else
+				fos.getChannel().transferFrom(rbc, 0, size);
 			rbc.close();
 			fos.close();
 		} catch (MalformedURLException e) {
@@ -142,5 +181,8 @@ public class Downloader {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(values[0], values[1], values[2], values[3], values[4], values[5]);
 		return calendar;
+	}
+	public float getProgress(){
+		return progress;
 	}
 }
