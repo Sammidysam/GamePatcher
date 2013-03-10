@@ -14,6 +14,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Calendar;
 import java.util.Scanner;
+import java.util.TimeZone;
 
 public class Downloader {
 	private String filePath;
@@ -104,6 +105,8 @@ public class Downloader {
 		}
 		if(dateFile.exists()){
 			Calendar calendar = Calendar.getInstance();
+			TimeZone gmt = TimeZone.getTimeZone("GMT");
+			calendar.setTimeZone(gmt);
 			String[] values = new String[6];
 			values[0] = String.valueOf(calendar.get(Calendar.YEAR));
 			values[1] = String.valueOf(calendar.get(Calendar.MONTH) + 1);

@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -52,10 +53,12 @@ public class Updater {
 			if(file.exists()){
 				Calendar calendar = Calendar.getInstance();
 				String[] values = new String[6];
+				TimeZone gmt = TimeZone.getTimeZone("GMT");
+				calendar.setTimeZone(gmt);
 				values[0] = String.valueOf(calendar.get(Calendar.YEAR));
 				values[1] = String.valueOf(calendar.get(Calendar.MONTH) + 1);
 				values[2] = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-				values[3] = String.valueOf(calendar.get(Calendar.HOUR));
+				values[3] = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
 				values[4] = String.valueOf(calendar.get(Calendar.MINUTE));
 				values[5] = String.valueOf(calendar.get(Calendar.SECOND));
 				try {
