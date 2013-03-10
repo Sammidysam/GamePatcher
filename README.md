@@ -19,7 +19,16 @@ If you are using this library, please make your launcher a different JAR than yo
 
 <pre>
   	Downloader downloader = new Downloader("text.txt", "date.txt", "http://sammidysam.github.com/text.txt", "http://sammidysam.github.com/date.txt");
-		downloader.checkForUpdate();
-		Updater updater = new Updater("text.txt", "date.txt", "C:\\Users\\Sam\\Documents\\Website\\Sammidysam.github.com\\");
-		updater.update();
+	downloader.checkForUpdate();
+	Updater updater = new Updater("text.txt", "date.txt", "C:\\Users\\Sam\\Documents\\Website\\Sammidysam.github.com\\");
+	updater.update();
 </pre>
+
+Now, if you'd like, you can get the downloader to give you a progress reading on the console.  The code to accomplish this is very similar to the original Downloader code, but there is one more argument: chunk size.  This chunk size variable will determine how many bytes are received each time progress is updated.  The lower the more printings of the progress there will be.  Here is some example code:
+
+<pre>
+	Downloader downloader = new Downloader("hgbg1.0.2.zip", "date.txt", "http://sammidysam.github.com/hgbg1.0.2.zip", "http://sammidysam.github.com/date.txt", 1000);
+	downloader.checkForUpdate();
+</pre>
+
+It will simply print out the current progress of the download.
