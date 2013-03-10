@@ -26,6 +26,7 @@ public class Downloader {
 	private boolean usingChunks;
 	private float progress;
 	private boolean hasInternet;
+	private boolean downloaded = false;
 	public Downloader(String fileName, String dateName, String fileSite, String dateSite, long chunkSize){
 		filePath = System.getProperty("user.dir") + File.separatorChar + fileName;
 		datePath = System.getProperty("user.dir") + File.separatorChar + dateName;
@@ -165,6 +166,7 @@ public class Downloader {
 				e.printStackTrace();
 			}
 			System.out.println("Datestamp success");
+			downloaded = true;
 		}
 	}
 	private Calendar fileToCalendar(String path){
@@ -184,5 +186,8 @@ public class Downloader {
 	}
 	public float getProgress(){
 		return progress;
+	}
+	public boolean getDownloaded(){
+		return downloaded;
 	}
 }
