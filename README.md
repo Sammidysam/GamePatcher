@@ -31,4 +31,4 @@ Now, if you'd like, you can get the downloader to give you a progress reading on
 	downloader.checkForUpdate();
 </pre>
 
-It will simply print out the current progress of the download.
+It will simply print out the current progress of the download.  There is also a public float getProgress() method in Downloader which can be used to get the current progress if you intend to put it in a progress bar.  The library does not provide this however since you may want to customize your progress bar and make it really awesome.
