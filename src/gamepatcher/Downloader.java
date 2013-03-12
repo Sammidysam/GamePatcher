@@ -52,25 +52,10 @@ public class Downloader extends Patcher {
 		this.dateSite = dateSite;
 //		checks if internet is available by pinging the URL specified in settings.txt
 		System.out.println("Checking if internet is available...");
-		try {
-			InetAddress gitHub = InetAddress.getByName(new URL(pingURL).getHost());
-			if(gitHub.isReachable(5000)){
-				hasInternet = true;
-				System.out.println("Internet connection available");
-			}
-			else
-				hasInternet = false;	
-		} catch (UnknownHostException e) {
-			hasInternet = false;
-		} catch (MalformedURLException e) {
-			ErrorLogger.logError(e);
-			return;
-		} catch (IOException e) {
-			ErrorLogger.logError(e);
-			return;
-		}
+		hasInternet = checkForInternet();
 	}
 	public void checkForUpdate(){
+		scanAndDeleteOldFiles("tempDate", datePath.substring(datePath.lastIndexOf('.'), datePath.length()));
 		scanAndDeleteOldFiles("tempFile", filePath.substring(filePath.lastIndexOf('.'), filePath.length()));
 		if(hasInternet){
 			if(new File(filePath).exists() && new File(datePath).exists()){
@@ -78,10 +63,13 @@ public class Downloader extends Patcher {
 				System.out.println("Checking date of update...");
 				ReadableByteChannel rbc = null;
 				FileOutputStream fos = null;
+				File tempDate = null;
 				try {
 					URL date = new URL(dateSite);
 					rbc = Channels.newChannel(date.openStream());
-					fos = new FileOutputStream(System.getProperty("user.dir") + File.separatorChar + "tempDate.txt");
+					tempDate = File.createTempFile("tempDate", ".txt");
+					tempDate.deleteOnExit();
+					fos = new FileOutputStream(tempDate);
 					fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 				} catch (MalformedURLException e) {
 					ErrorLogger.logError(e);
@@ -108,10 +96,8 @@ public class Downloader extends Patcher {
 							return;
 						}
 				}
-				Calendar timeOfUpdate = fileToCalendar(System.getProperty("user.dir") + File.separatorChar + "tempDate.txt");
+				Calendar timeOfUpdate = fileToCalendar(tempDate.getAbsolutePath());
 				Calendar timeOnFile = fileToCalendar(datePath);
-				if(!new File(System.getProperty("user.dir") + File.separatorChar + "tempDate.txt").delete())
-					return;
 				if(timeOnFile.compareTo(timeOfUpdate) > 0)
 					System.out.println("No download necessary");
 				else
@@ -138,7 +124,6 @@ public class Downloader extends Patcher {
 			long size = urlconnection.getContentLength();
 			rbc = Channels.newChannel(file.openStream());
 			fos = new FileOutputStream(temp);
-			System.out.println(temp.getAbsolutePath());
 			long position = 0;
 			if(usingChunks)
 				while(position < size){
@@ -152,7 +137,6 @@ public class Downloader extends Patcher {
 //				if not printing percentage, it will download the whole thing in one round
 				fos.getChannel().transferFrom(rbc, 0, size);
 			File actual = new File(filePath);
-//			the file will now be copied to the desired directory
 			if(actual.exists())
 				if(!actual.delete())
 					return;
@@ -267,6 +251,27 @@ public class Downloader extends Patcher {
 				return;
 			}
 		}
+	}
+	private boolean checkForInternet(){
+		boolean hasInternet = false;
+		try {
+			InetAddress gitHub = InetAddress.getByName(new URL(pingURL).getHost());
+			if(gitHub.isReachable(5000)){
+				hasInternet = true;
+				System.out.println("Internet connection available");
+			}
+			else
+				hasInternet = false;	
+		} catch (UnknownHostException e) {
+			hasInternet = false;
+		} catch (MalformedURLException e) {
+			ErrorLogger.logError(e);
+			return false;
+		} catch (IOException e) {
+			ErrorLogger.logError(e);
+			return false;
+		}
+		return hasInternet;
 	}
 	public float getProgress(){
 		return progress;
