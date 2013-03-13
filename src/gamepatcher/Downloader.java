@@ -6,8 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -52,7 +53,7 @@ public class Downloader extends Patcher {
 		this.dateSite = dateSite;
 //		checks if internet is available by pinging the URL specified in settings.txt
 		System.out.println("Checking if internet is available...");
-		hasInternet = checkForInternet();
+		hasInternet = isInternetReachable();
 	}
 	public void checkForUpdate(){
 		scanAndDeleteOldFiles("tempDate", datePath.substring(datePath.lastIndexOf('.'), datePath.length()));
@@ -127,8 +128,39 @@ public class Downloader extends Patcher {
 			long position = 0;
 			if(usingChunks)
 				while(position < size){
+					if(!hasInternet)
+						return;
 //					downloads chunkSize bytes and increases the position on the download accordingly
-					position += fos.getChannel().transferFrom(rbc, position, chunkSize);
+					final long finalPosition = position;
+					final FileOutputStream finalFos = fos;
+					final ReadableByteChannel finalRbc = rbc;
+					Thread download = new Thread(new Runnable(){
+						public void run(){
+							try {
+								if(hasInternet)
+									finalFos.getChannel().transferFrom(finalRbc, finalPosition, chunkSize);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					download.start();
+					try {
+						download.join(chunkSize);
+					} catch (InterruptedException e) {
+						ErrorLogger.logError(e);
+						return;
+					}
+					if(download.isAlive())
+						if(!isInternetReachable())
+							if(!hasInternetFallback()){
+//								this is a nested if because I only want to check internet if the above requirement works because checking internet takes some time
+								System.out.println("Internet connection lost");
+								hasInternet = false;
+								return;
+							}
+					position += chunkSize;
+//					position += fos.getChannel().transferFrom(rbc, position, chunkSize);
 //					sets progress to the nearest tenth of the amount of bytes downloaded out of the total
 					progress = Math.round((float)(100 * (float)position / (float)size) * (float)10) / (float)10;
 					System.out.println(progress + "% done");
@@ -252,27 +284,42 @@ public class Downloader extends Patcher {
 			}
 		}
 	}
-	private boolean checkForInternet(){
-		boolean hasInternet = false;
+    private boolean isInternetReachable(){
+        try {
+            URL url = new URL(pingURL);
+            HttpURLConnection urlConnect = (HttpURLConnection) url.openConnection();
+            urlConnect.setConnectTimeout(1000);
+            urlConnect.getContent();
+        } catch (UnknownHostException e) {
+            return false;
+        } catch (NoRouteToHostException e) {
+        	return false;
+        } catch (IOException e) {
+            ErrorLogger.logError(e);
+            return false;
+        }
+        return true;
+    }
+    private boolean hasInternetFallback(){
+    	String specialPingURL = pingURL.substring(pingURL.indexOf('w'), pingURL.length());
+    	if(specialPingURL.charAt(specialPingURL.length() - 1) == '/')
+    		specialPingURL = specialPingURL.substring(0, specialPingURL.length() - 1);
+    	ProcessBuilder pb = null;
+    	if(System.getProperty("os.name").startsWith("Windows"))
+    		pb = new ProcessBuilder("ping", "-n", "1", specialPingURL);
+    	else
+    		pb = new ProcessBuilder("ping", "-c", "1", specialPingURL);
 		try {
-			InetAddress gitHub = InetAddress.getByName(new URL(pingURL).getHost());
-			if(gitHub.isReachable(5000)){
-				hasInternet = true;
-				System.out.println("Internet connection available");
-			}
-			else
-				hasInternet = false;	
-		} catch (UnknownHostException e) {
-			hasInternet = false;
-		} catch (MalformedURLException e) {
-			ErrorLogger.logError(e);
-			return false;
+			Process check = pb.start();
+			return check.waitFor() == 0 ? true : false;
 		} catch (IOException e) {
 			ErrorLogger.logError(e);
 			return false;
+		} catch (InterruptedException e) {
+			ErrorLogger.logError(e);
+			return false;
 		}
-		return hasInternet;
-	}
+    }
 	public float getProgress(){
 		return progress;
 	}

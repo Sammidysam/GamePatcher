@@ -16,11 +16,10 @@ public class ErrorLogger {
 			e.printStackTrace(error);
 //			prints error to new file.  the file will look like this: error + lots of numbers + .txt
 			System.out.println("Error " + e.toString() + " occured.  Error log will be stored in " + new File(System.getProperty("user.dir")).getAbsolutePath());
-			System.out.println("The game patcher will stop trying to patch due to this error.");
 		} catch (FileNotFoundException e1) {
-			logError(e);
+			e1.printStackTrace();
 		} catch (IOException e1) {
-			logError(e);
+			e1.printStackTrace();
 		} finally {
 			if(error != null)
 				error.close();
