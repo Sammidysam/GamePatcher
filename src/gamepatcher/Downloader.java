@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -305,6 +306,8 @@ public class Downloader extends Patcher {
             HttpURLConnection urlConnect = (HttpURLConnection) url.openConnection();
             urlConnect.setConnectTimeout(1000);
             urlConnect.getContent();
+        } catch (SocketTimeoutException e){
+        	return false;
         } catch (UnknownHostException e) {
             return false;
         } catch (NoRouteToHostException e) {

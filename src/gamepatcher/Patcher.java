@@ -22,7 +22,7 @@ public class Patcher {
 					scanner.nextLine();
 				if(scanner.hasNext()){
 					String location = scanner.nextLine();
-					location = location.substring(location.indexOf(':'), location.length());
+					location = location.substring(location.indexOf(':') + 1, location.length());
 					if(new File(location).exists())
 						System.setProperty("user.dir", location);
 				}
@@ -44,7 +44,7 @@ public class Patcher {
 					File attemptFile = new File(attemptPath.substring(0, attemptPath.lastIndexOf(File.separatorChar) - 1).substring(0, attemptPath.substring(0, attemptPath.lastIndexOf(File.separatorChar) - 1).lastIndexOf(File.separatorChar)));
 					if(attemptFile.exists()){
 						System.setProperty("user.dir", attemptFile.getAbsolutePath());
-						setPingURL();
+						setUserDir();
 						break;
 					}
 					else {
