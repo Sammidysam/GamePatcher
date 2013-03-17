@@ -37,7 +37,29 @@ public class Patcher {
 				makeSettings(file);
 				setUserDir();
 			} catch (IOException e) {
-				ErrorLogger.logError(e);
+				String attemptPath = file.getAbsolutePath();
+				while (true){
+					if(attemptPath.lastIndexOf(File.separatorChar) == -1)
+						break;
+					File attemptFile = new File(attemptPath.substring(0, attemptPath.lastIndexOf(File.separatorChar) - 1).substring(0, attemptPath.substring(0, attemptPath.lastIndexOf(File.separatorChar) - 1).lastIndexOf(File.separatorChar)));
+					if(attemptFile.exists()){
+						System.setProperty("user.dir", attemptFile.getAbsolutePath());
+						setPingURL();
+						break;
+					}
+					else {
+						try {
+							makeSettings(attemptFile);
+							System.out.println("No write access in desired directory!  Settings made at " + attemptFile.getAbsolutePath());
+							System.out.println("The file will be downloaded to " + attemptFile.getAbsolutePath() + " as well.");
+							System.setProperty("user.dir", attemptFile.getAbsolutePath());
+							setUserDir();
+							break;
+						} catch (IOException e1) {
+							
+						}
+					}
+				}
 			}
 		}
 	}
@@ -70,7 +92,29 @@ public class Patcher {
 				makeSettings(file);
 				setPingURL();
 			} catch (IOException e) {
-				ErrorLogger.logError(e);
+				String attemptPath = file.getAbsolutePath();
+				while (true){
+					if(attemptPath.lastIndexOf(File.separatorChar) == -1)
+						break;
+					File attemptFile = new File(attemptPath.substring(0, attemptPath.lastIndexOf(File.separatorChar) - 1).substring(0, attemptPath.substring(0, attemptPath.lastIndexOf(File.separatorChar) - 1).lastIndexOf(File.separatorChar)));
+					if(attemptFile.exists()){
+						System.setProperty("user.dir", attemptFile.getAbsolutePath());
+						setPingURL();
+						break;
+					}
+					else {
+						try {
+							makeSettings(attemptFile);
+							System.out.println("No write access in desired directory!  Settings made at " + attemptFile.getAbsolutePath());
+							System.out.println("The file will be downloaded to " + attemptFile.getAbsolutePath() + " as well.");
+							System.setProperty("user.dir", attemptFile.getAbsolutePath());
+							setPingURL();
+							break;
+						} catch (IOException e1) {
+							
+						}
+					}
+				}
 			}
 		}
 	}

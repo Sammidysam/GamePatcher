@@ -19,7 +19,16 @@ public class ErrorLogger {
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			String original = System.getProperty("user.dir");
+			boolean doTwice = false;
+			if(original.charAt(original.length() - 1) == File.separatorChar)
+				doTwice = true;
+			String newUserDir = original.substring(0, original.lastIndexOf(File.separatorChar));
+			if(doTwice)
+				newUserDir = original.substring(0, original.lastIndexOf(File.separatorChar));
+			System.setProperty("user.dir", newUserDir);
+			logError(e);
+			System.setProperty("user.dir", original);
 		} finally {
 			if(error != null)
 				error.close();

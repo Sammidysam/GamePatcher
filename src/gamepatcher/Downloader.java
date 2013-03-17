@@ -14,6 +14,7 @@ import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -122,9 +123,12 @@ public class Downloader extends Patcher {
 			temp.deleteOnExit();
 			URL file = new URL(fileSite);
 			URLConnection urlconnection = file.openConnection();
+			urlconnection.setReadTimeout(5000);
 			long size = urlconnection.getContentLength();
 			rbc = Channels.newChannel(file.openStream());
 			fos = new FileOutputStream(temp);
+			final FileOutputStream finalFos = fos;
+			final ReadableByteChannel finalRbc = rbc;
 			long position = 0;
 			if(usingChunks)
 				while(position < size){
@@ -132,8 +136,6 @@ public class Downloader extends Patcher {
 						return;
 //					downloads chunkSize bytes and increases the position on the download accordingly
 					final long finalPosition = position;
-					final FileOutputStream finalFos = fos;
-					final ReadableByteChannel finalRbc = rbc;
 					Thread download = new Thread(new Runnable(){
 						public void run(){
 							try {
@@ -157,7 +159,16 @@ public class Downloader extends Patcher {
 //								this is a nested if because I only want to check internet if the above requirement works because checking internet takes some time
 								System.out.println("Internet connection lost");
 								hasInternet = false;
+								finalFos.close();
+								finalRbc.close();
 								return;
+							}
+							else {
+								try {
+									download.join();
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
 							}
 					position += chunkSize;
 //					position += fos.getChannel().transferFrom(rbc, position, chunkSize);
@@ -175,6 +186,10 @@ public class Downloader extends Patcher {
 			Path temporary = temp.toPath();
 			Path desired = actual.toPath();
 			Files.copy(temporary, desired, REPLACE_EXISTING);
+		} catch (AccessDeniedException e) {
+			System.out.println("Access is denied to copy the file to the desired folder.  Please change the path in gamepatchersettings.txt to a folder in which you have write access.");
+			ErrorLogger.logError(e);
+			return;
 		} catch (MalformedURLException e) {
 			ErrorLogger.logError(e);
 			return;
