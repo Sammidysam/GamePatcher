@@ -159,9 +159,8 @@ public class Downloader extends Patcher {
 							if(!hasInternetFallback()){
 //								this is a nested if because I only want to check internet if the above requirement works because checking internet takes some time
 								System.out.println("Internet connection lost");
-								hasInternet = false;
-								finalFos.close();
-								finalRbc.close();
+								System.out.println("Please relaunch the application in order to have the game launched");
+								System.exit(1);
 								return;
 							}
 							else {

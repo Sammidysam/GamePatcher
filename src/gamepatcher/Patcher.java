@@ -119,7 +119,7 @@ public class Patcher {
 		}
 	}
 	private void makeSettings(File settings) throws IOException {
-//		makes the settings file and inputs default values (line 1-"Custom directory path:", line 2-"Custom ping URL:https://github.com/")
+//		makes the settings file and inputs default values (line 1-"Custom directory path:", line 2-"Custom ping URL:https://google.com/")
 		if(settings.createNewFile()){
 			FileWriter settingsWriter = new FileWriter(settings);
 			BufferedWriter bw = new BufferedWriter(settingsWriter);
@@ -127,7 +127,7 @@ public class Patcher {
 			bw.newLine();
 			bw.write("Custom directory path (no setting will result in the directory that the launcher is in):");
 			bw.newLine();
-			bw.write("Custom ping URL:https://github.com/");
+			bw.write("Custom ping URL:https://google.com/");
 			bw.close();
 		}
 		else
