@@ -13,10 +13,15 @@ import gamepatcher.Downloader;
 public class Main {
 	public static void main(String[] args){
 		Downloader downloader = new Downloader("PixelZombies.zip", "date.txt", "http://sammidysam.github.com/PixelZombies/PixelZombies.zip", "http://sammidysam.github.com/PixelZombies/date.txt", 1000);
+		if(args.length > 0)
+			for(int i = 0; i < args.length; i++)
+				if(args[i].equalsIgnoreCase("allowdenial"))
+					downloader.setDenial(true);
 		downloader.checkForUpdate();
 		if(downloader.getDownloaded()){
 			try {
 				extractFolder(System.getProperty("user.dir") + File.separatorChar + "PixelZombies.zip");
+				System.out.println("Extraction of zip file complete");
 			} catch (ZipException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -24,6 +29,7 @@ public class Main {
 			}
 		}
 		if(new File(System.getProperty("user.dir") + File.separatorChar + "PixelZombies.jar").exists()){
+			System.out.println("Launching jar...");
 			ProcessBuilder pb = new ProcessBuilder("java", "-jar", System.getProperty("user.dir") + File.separatorChar + "PixelZombies.jar");
 			pb.directory(new File(System.getProperty("user.dir")));
 			try {
@@ -33,6 +39,8 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
+		else
+			System.out.println("Could not find jar file, will not launch");
 	}
 	private static void extractFolder(String zipFile) throws ZipException, IOException {
 	    System.out.println("Extracting zip...");

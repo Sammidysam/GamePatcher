@@ -1,11 +1,13 @@
 package gamepatcher;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.NoRouteToHostException;
@@ -36,6 +38,8 @@ public class Downloader extends Patcher {
 	private float progress;
 	private boolean hasInternet;
 	private boolean downloaded = false;
+	private boolean denial = false;
+//	this boolean allows you to deny new updates
 	public Downloader(String fileName, String dateName, String fileSite, String dateSite, long chunkSize){
 		constructor(fileName, dateName, fileSite, dateSite);
 //		sets chunkSize, which is the amount of data downloaded per round
@@ -114,6 +118,24 @@ public class Downloader extends Patcher {
 	}
 	private void downloadFiles(){
 		System.out.println("Download necessary");
+		if(denial){
+			System.out.println("Would you like to update?");
+			System.out.println("Typing 'y' = yes.  Typing 'n' = no.  Case does not matter.  Don't type the apostraphes.");
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			String result = null;
+			try {
+				result = br.readLine();
+			} catch (IOException e) {
+				ErrorLogger.logError(e);
+				return;
+			}
+			if(result.equalsIgnoreCase("n"))
+				return;
+			else if(!result.equalsIgnoreCase("y")){
+				System.out.println("You did not type 'n' or 'y' so no download will be updated.");
+				return;
+			}
+		}
 		System.out.println("Downloading...");
 		ReadableByteChannel rbc = null;
 		FileOutputStream fos = null;
@@ -336,6 +358,9 @@ public class Downloader extends Patcher {
 			ErrorLogger.logError(e);
 			return false;
 		}
+    }
+    public void setDenial(boolean denial){
+    	this.denial = denial;
     }
 	public float getProgress(){
 		return progress;
