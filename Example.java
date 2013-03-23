@@ -1,6 +1,5 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -37,6 +36,7 @@ public class Main extends JPanel {
 	        panel.frame.setResizable(false);
 	        panel.frame.setLocationRelativeTo(null);
 	        JTextField text = new JTextField("Would you like to download an update?");
+	        text.setHorizontalAlignment(JTextField.CENTER);
 	        text.setEditable(false);
 	        panel.frame.add(text, BorderLayout.PAGE_START);
 	        JButton yes = new JButton("Yes");
@@ -117,9 +117,6 @@ public class Main extends JPanel {
 	            extractFolder(destFile.getAbsolutePath());
 	        }
 	    }
-	}
-	public void paintComponent(Graphics g){
-		
 	}
 	private void buttonClicked(){
 		frame.dispose();
