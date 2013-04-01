@@ -126,7 +126,7 @@ public class Downloader extends Patcher {
 				scanner.close();
 		}
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(values[0], values[1], values[2], values[3], values[4], values[5]);
+		calendar.set(values[0], values[1] - 1, values[2], values[3], values[4], values[5]);
 		return calendar;
 	}
 	private void scanAndDeleteOldFiles(String name, String suffix){
