@@ -47,78 +47,8 @@ public class Main {
 	        main.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	        main.frame.setResizable(false);
 	        main.frame.setLocationRelativeTo(null);
-	        JPanel mainPanel = new JPanel();
-	        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-	        JTextField text = new JTextField("Would you like to download an update?");
-	        text.setHorizontalAlignment(JTextField.CENTER);
-	        text.setEditable(false);
-	        text.setHighlighter(null);
-	        text.setPreferredSize(new Dimension(220, 20));
-	        mainPanel.add(text);
-	        JPanel yesno = new JPanel();
-	        yesno.setLayout(new BoxLayout(yesno, BoxLayout.X_AXIS));
-	        JButton yes = new JButton("Yes");
-	        yes.setPreferredSize(new Dimension(110, 20));
-	        yes.setMaximumSize(new Dimension(110, 20));
-	        yes.addActionListener(new ActionListener(){
-	        	public void actionPerformed(ActionEvent e){
-	        		main.downloader.downloadFiles();
-	        		main.buttonClicked();
-	        	}
-	        });
-	        yesno.add(yes, BorderLayout.LINE_START);
-	        JButton no = new JButton("No");
-	        no.setPreferredSize(new Dimension(110, 20));
-	        no.setMaximumSize(new Dimension(110, 20));
-	        no.addActionListener(new ActionListener(){
-	        	public void actionPerformed(ActionEvent e){
-	        		main.buttonClicked();
-	        	}
-	        });
-	        yesno.add(no, BorderLayout.LINE_END);
-	        mainPanel.add(yesno);
-	        JTextArea changeLog = new JTextArea();
-	        changeLog.setEditable(false);
-	        changeLog.setBackground(text.getBackground());
-	        changeLog.setLineWrap(true);
-	        changeLog.setWrapStyleWord(true);
-	        changeLog.setHighlighter(null);
-	        File changelog = main.getChangelog();
-	        BufferedReader br = null;
-	        FileReader reader = null;
-	        try {
-				reader = new FileReader(changelog);
-				br = new BufferedReader(reader);
-				String line;
-				while((line = br.readLine()) != null){
-					if(line.startsWith("\t"))
-						line = "   " + line.substring(1);
-					changeLog.append(line + '\n');
-				}
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			} finally {
-				if(br != null)
-					try {
-						br.close();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				if(reader != null)
-					try {
-						reader.close();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-			}
-	        JScrollPane scroll = new JScrollPane(changeLog);
-	        scroll.setPreferredSize(new Dimension(220, 100));
-	        mainPanel.add(scroll);
-	        main.frame.add(mainPanel);
-	        main.frame.pack();
-	        main.frame.setVisible(true);
+	        System.out.println("Adding components...");
+	        main.addComponents();
 		}
 		else {
 			if(main.downloader.getDownloaded()){
@@ -145,6 +75,80 @@ public class Main {
 			else
 				System.out.println("Could not find jar file, will not launch");
 		}
+	}
+	private void addComponents(){
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        JTextField text = new JTextField("Would you like to download an update?");
+        text.setHorizontalAlignment(JTextField.CENTER);
+        text.setEditable(false);
+        text.setHighlighter(null);
+        mainPanel.add(text);
+        int width = text.getFontMetrics(text.getFont()).stringWidth(text.getText()) + 6;
+        JPanel yesno = new JPanel();
+        yesno.setLayout(new BoxLayout(yesno, BoxLayout.X_AXIS));
+        JButton yes = new JButton("Yes");
+        yes.setPreferredSize(new Dimension(width / 2, 20));
+        yes.setMaximumSize(new Dimension(width / 2, 20));
+        yes.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		downloader.downloadFiles();
+        		buttonClicked();
+        	}
+        });
+        yesno.add(yes, BorderLayout.LINE_START);
+        JButton no = new JButton("No");
+        no.setPreferredSize(new Dimension(width / 2, 20));
+        no.setMaximumSize(new Dimension(width / 2, 20));
+        no.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		buttonClicked();
+        	}
+        });
+        yesno.add(no, BorderLayout.LINE_END);
+        mainPanel.add(yesno);
+        JTextArea changeLog = new JTextArea();
+        changeLog.setEditable(false);
+        changeLog.setBackground(text.getBackground());
+        changeLog.setLineWrap(true);
+        changeLog.setWrapStyleWord(true);
+        changeLog.setHighlighter(null);
+        File changelog = getChangelog();
+        BufferedReader br = null;
+        FileReader reader = null;
+        try {
+			reader = new FileReader(changelog);
+			br = new BufferedReader(reader);
+			String line;
+			while((line = br.readLine()) != null){
+				if(line.startsWith("\t"))
+					line = "   " + line.substring(1);
+				changeLog.append(line + '\n');
+			}
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} finally {
+			if(br != null)
+				try {
+					br.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			if(reader != null)
+				try {
+					reader.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+		}
+        JScrollPane scroll = new JScrollPane(changeLog);
+        scroll.setPreferredSize(new Dimension(220, 100));
+        mainPanel.add(scroll);
+        frame.add(mainPanel);
+        frame.pack();
+        frame.setVisible(true);
 	}
 	private static void extractFolder(String zipFile) throws ZipException, IOException {
 	    System.out.println("Extracting zip...");
