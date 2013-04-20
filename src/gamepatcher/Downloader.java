@@ -162,7 +162,7 @@ public class Downloader extends Patcher {
 		FileOutputStream fos = null;
 		try {
 //			creates file in temporary directory to be downloaded to, so that the main file isn't lost if the download is aborted
-			File temp = File.createTempFile("tempFile", filePath.substring(filePath.lastIndexOf('.'), filePath.length()));
+			File temp = File.createTempFile("tempFile", getSuffix(filePath));
 //			the file will be deleted upon exit unless the download is aborted mid-way
 			temp.deleteOnExit();
 			URL file = new URL(fileSite);
