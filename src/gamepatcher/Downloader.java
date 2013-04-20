@@ -47,8 +47,8 @@ public class Downloader extends Patcher {
 		datePath = System.getProperty("user.dir") + File.separatorChar + dateName;
 		this.fileSite = fileSite;
 		this.dateSite = dateSite;
-		scanAndDeleteOldFiles("tempDate", datePath.substring(datePath.lastIndexOf('.'), datePath.length()));
-		scanAndDeleteOldFiles("tempFile", filePath.substring(filePath.lastIndexOf('.'), filePath.length()));
+		scanAndDeleteOldFiles("tempDate", getSuffix(datePath));
+		scanAndDeleteOldFiles("tempFile", getSuffix(filePath));
 	}
 	public boolean isUpdateNecessary(){
 		if(new File(filePath).exists() && new File(datePath).exists()){
@@ -128,6 +128,9 @@ public class Downloader extends Patcher {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(values[0], values[1] - 1, values[2], values[3], values[4], values[5]);
 		return calendar;
+	}
+	private String getSuffix(String fileName){
+		return fileName.contains(".") ? fileName.substring(fileName.lastIndexOf('.'), fileName.length()) : "";
 	}
 	private void scanAndDeleteOldFiles(String name, String suffix){
 //		if the download is aborted, a temporary file will be left behind.  this method deletes all temporary files left behind in the past
