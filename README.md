@@ -25,3 +25,8 @@ If you are using this library, please make your launcher a different JAR than yo
 </pre>
 
 A great example of what you can do with this library is in Example.java .  I suggest you go there if you seek to make a launcher with this library.
+
+License
+=======
+
+This program is licensed under the GNU Lesser General Public License version 3. To see the license, visit the file [LICENSE](LICENSE).
